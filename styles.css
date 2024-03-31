@@ -1,0 +1,22 @@
+body {
+	margin: 0px;
+	display: grid;
+	grid-template-columns: 10vw 90vw;
+	grid-template-rows: 100vh;
+	touch-action: none;
+	background: skyblue;
+	/*font-size: 5vh;*/
+	height: 100vh;
+}
+#hub {
+	width: 100%;
+	aspect-ratio: 1/1;
+	background: skyblue;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	box-sizing: border-box;
+	border-right: solid;
+	font-size: 4vh;
+}
