@@ -1,4 +1,4 @@
-import image_library from "/image_library/image_library.mjs"
+import image_library from "./image_library/image_library.mjs"
 const KEYS = ["Aa", "Bb", "Cc", "Dd", "Ee", "Ff", "Gg", "Hh", "Ii", "Jj", "Kk", "Ll", "Mm", "Nn", "Oo", "Pp", "Qq", "Rr", "Ss", "Tt", "Uu", "Vv", "Ww", "Xx", "Yy", "Zz"]
 
 function updateKeyboard(testString) {
