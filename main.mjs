@@ -125,7 +125,15 @@ function Player() {
 	buttonOK.disabled = true;
 	buttonOK.removeEventListener("pointerdown", letterPointerdownHandler);
 	buttonOK.addEventListener("pointerdown", function () {
-		console.log(this.player.word, "chosen");
+		let choices = image_library.filter(o => o.text === this.player.word);
+		let choice = choices[Math.floor(Math.random()*choices.length)];
+		let img = document.createElement("img");
+		img.src = "image_library/images/"+choice.src;
+		this.player.divImage.appendChild(img);
+		this.player.divKeyboard.style.display = "none";
+		this.player.buttonReset.style.display = "flex";
+		this.player.divWord.innerHTML = choice.text.toUpperCase();
+		console.log(this.player.word, "chosen", choice);
 	});
 	this.buttonOK = buttonOK;
 	this.divKeyboard.appendChild(buttonOK);

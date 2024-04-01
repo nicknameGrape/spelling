@@ -13,6 +13,7 @@ body {
 #top {
 	display: grid;
 	grid-template-columns: 15vh 1fr 4fr;
+	background: tan;
 }
 
 #hub {
@@ -69,8 +70,12 @@ input[type="checkbox"]:checked+label {
 #title {
 	display: flex;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-around;
 	font-size: 7vh;
+}
+
+#dl {
+	font-size: 3vh;
 }
 
 #players {
@@ -82,7 +87,7 @@ input[type="checkbox"]:checked+label {
 .player {
 	display: grid;
 	grid-template-rows: 30vh 10vh 45vh;
-	width: 90%;
+	width: 100%;
 }
 
 .image_library {
@@ -117,8 +122,8 @@ input[type="checkbox"]:checked+label {
 
 .key {
 	background: pink;
-	font-family: sans;
-	font-size: 3vh;
+	font-family: serif;
+	font-size: 4vh;
 }
 
 #buttonReset {
