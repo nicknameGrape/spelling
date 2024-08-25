@@ -58,6 +58,7 @@ function updateKeyboard(testString) {
 		let img = document.createElement("img");
 		img.src = "image_library/images/"+pool[0].src;
 		p.divImage.appendChild(img);
+		p.divImage.style.display = "";
 	}
 }
 
@@ -65,6 +66,23 @@ function letterPointerdownHandler() {
 	let ll = this.value;
 	let testString = this.player.word+ll;
 	updateKeyboard.bind(this)(testString);
+}
+
+function playerCountChange(num) {
+	playerCount = num;
+	console.log("NUM", num);
+	localStorage.setItem("players", num);
+	console.log("SETITEM", playerCount, "players", localStorage.getItem("players"));
+	players.forEach(function (p, index) {
+		if (parseInt(p.radio.value) > playerCount) {
+			p.div.style.display = "none";
+		} else {
+			if (index == num - 1) {
+				p.radio.checked = true;
+			}
+			p.div.style.display = "flex";
+		}
+	});
 }
 
 function newKey(Kk, value, gridArea, player) {
@@ -83,6 +101,7 @@ function Player() {
 	this.div.classList.add("player");
 	this.divImage = document.createElement("div");
 	this.divImage.classList.add("image_library");
+	this.divImage.style.display = "none";
 	this.divWord = document.createElement("div");
 	this.divWord.classList.add("word");
 	this.divKeyboard = document.createElement("div");
@@ -92,7 +111,6 @@ function Player() {
 	this.buttonReset.style.display = "none";
 	this.buttonReset.innerHTML = "Reset";
 	this.buttonReset.player = this;
-	console.log(this.buttonReset.player);
 	this.buttonReset.addEventListener("pointerdown", function () {
 		this.style.display = "none";
 		this.player.divKeyboard.style.display = "grid";
@@ -115,6 +133,11 @@ function Player() {
 	}.bind(this));
 
 	//Special Keys
+	let buttonPeriod = new newKey(".", ".", "period", this);
+	buttonPeriod.classList.add("letterKey");
+	buttonPeriod.id = "buttonPeriod";
+	this.divKeyboard.appendChild(buttonPeriod);
+
 	let buttonSpace = new newKey(" ", " ", "space", this);
 	buttonSpace.classList.add("letterKey");
 	buttonSpace.id = "buttonSpace";
@@ -130,10 +153,12 @@ function Player() {
 		let img = document.createElement("img");
 		img.src = "image_library/images/"+choice.src;
 		this.player.divImage.appendChild(img);
+		this.player.divImage.style.display = "";
 		this.player.divKeyboard.style.display = "none";
 		this.player.buttonReset.style.display = "flex";
 		this.player.divWord.innerHTML = choice.text.toUpperCase();
 		console.log(this.player.word, "chosen", choice);
+		console.log(this.player.divImage, "DIVIMAGE", img);
 	});
 	this.buttonOK = buttonOK;
 	this.divKeyboard.appendChild(buttonOK);
@@ -144,15 +169,42 @@ function Player() {
 		this.player.word = this.player.word.slice(0, -1);
 		updateKeyboard.bind(this)(this.player.word);
 	});
-	buttonBS.style.fontSize = "3vh";
-	buttonBS.style.background = "red";
+	buttonBS.classList.add("key");
+	buttonBS.classList.add("buttonBackSpace");
 	this.divKeyboard.appendChild(buttonBS);
 
-	this.div.appendChild(this.divImage);
 	this.div.appendChild(this.divWord);
+	this.div.appendChild(this.divImage);
 	this.div.appendChild(this.divKeyboard);
 	this.div.appendChild(this.buttonReset);
 }
 
-let p1 = new Player();
-document.getElementById("players").appendChild(p1.div);
+let playerCount = localStorage.getItem("players");
+if (playerCount === null) {playerCount = 1;}
+console.log("PC", localStorage.getItem("players"), playerCount);
+let players = [
+]
+for (let i=0; i<5; i++) {
+	console.log(i);
+	let player = new Player();
+	let radio = document.createElement("input");
+	let label = document.createElement("label");
+	radio.id = "radio"+i;
+	radio.type = "radio";
+	radio.name = "numberOfPlayers";
+	radio.value = i+1;
+	radio.addEventListener("click", function (el) {
+		console.log("CHANGE PLAYER COUNT TO", el.target.value);
+		playerCountChange(el.target.value);
+	});
+	label.innerHTML = i+1;
+	label.htmlFor = radio.id;
+	player.radio = radio;
+	player.radioLabel = label;
+	player.div.style.display = "none";
+	document.getElementById("players").appendChild(player.div);
+	document.getElementById("divSetPlayerNumber").appendChild(radio);
+	document.getElementById("divSetPlayerNumber").appendChild(label);
+	players.push(player);
+}
+playerCountChange(playerCount);

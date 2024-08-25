@@ -2,7 +2,7 @@ body {
 	margin: 0px;
 	display: grid;
 	grid-template-columns: 100vw;
-	grid-template-rows: 15vh 75vh;
+	grid-template-rows: 15vh 85vh;
 	touch-action: none;
 	background: black;
 	color: white;
@@ -31,7 +31,6 @@ body {
 
 #divSetPlayerNumber {
 	display: grid;
-	visibility: hidden;
 	grid-template-rows: 1fr 2fr;
 	grid-template-areas:
 		"title title title title title"
@@ -76,29 +75,38 @@ input[type="checkbox"]:checked+label {
 
 #dl {
 	font-size: 3vh;
+	text-align: center;
 }
 
 #players {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
+	flex-direction: row;
+	align-items: flex-end;
+	justify-content: center;
 }
 
 .player {
-	display: grid;
-	grid-template-rows: 30vh 10vh 45vh;
-	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	/*grid-template-rows: 30vh 10vh 45vh;*/
+	width: min(50vw, 100%);
+	min-width: 20vw;
+	height: 100%;
+	box-sizing: border-box;
+	border: solid 10px;
 }
 
 .image_library {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: green;
+	background: snow;
 }
 
 .word {
 	display: flex;
+	text-align: center;
 	align-items: center;
 	justify-content: center;
 	background: white;
@@ -109,32 +117,38 @@ input[type="checkbox"]:checked+label {
 .keyboard {
 	display: grid;
 	background: gray;
+	margin-top: auto;
 	grid-template-areas:
 		"a b c d e f g"
 		"h i j k l m n"
 		"o p q r s t u"
-		"v w x y z bs ok"
-		". space space space . . ok";
+		"v w x y z period ok"
+		". space space space bs bs ok";
+	grid-template-columns: repeat(7, 1fr);
 	grid-template-rows: repeat(5, 1fr);
-	gap: 10px;
-	padding: 10px;
+	gap: 5px;
+	padding: 5px;
 }
 
 .key {
 	background: pink;
 	font-family: serif;
-	font-size: 4vh;
+	font-size: 1.5vh;
+}
+
+.buttonBackSpace {
+	background: red;
 }
 
 #buttonReset {
+	align-self: center;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 50%;
-	height: 50%;
-	align-self: center;
-	justify-self: center;
+	max-height: 10vh;
 	font-size: 5vh;
+	margin-top: auto;
 }
 
 button:disabled {
@@ -142,6 +156,7 @@ button:disabled {
 }
 
 img {
-	height: 100%;
+	width: 100%;
+	max-height: 50vh;
 	object-fit: contain;
 }

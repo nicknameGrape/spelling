@@ -1,0 +1,42 @@
+<html>
+<meta charset="UTF-8">
+<head>
+	<style>
+		body {
+			background: black;
+			margin:0;
+			touch-action: none;
+		}
+		#word {
+			height: 20%;
+			width: 100%;
+			background: white;
+		}
+		#picture {
+			height: 30%;
+			background: purple;
+		}
+		#keyboard {
+			height: 50%;
+			display: grid;
+			background: black;
+			grid-template-columns: repeat(7, 1fr);
+			grid-auto-rows: minmax(10px, auto);
+		}
+		.button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 5vh;
+			border: solid;
+			background: khaki;15:33 2022/11/29
+		}
+	</style>
+</head>
+<body>
+<script data-main="filter_main.js" src="../js/require.js"></script>
+<div id="word"><canvas></canvas></div>
+<div id="picture"><canvas></canvas></div>
+<div id="keyboard"></div>
+</body>
+</html>
