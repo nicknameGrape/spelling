@@ -1,5 +1,5 @@
 import image_library from "./image_library/image_library.mjs"
-const KEYS = ["Aa", "Bb", "Cc", "Dd", "Ee", "Ff", "Gg", "Hh", "Ii", "Jj", "Kk", "Ll", "Mm", "Nn", "Oo", "Pp", "Qq", "Rr", "Ss", "Tt", "Uu", "Vv", "Ww", "Xx", "Yy", "Zz"]
+const KEYS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
 function updateKeyboard(testString) {
 	let p = this.player;
@@ -85,10 +85,10 @@ function playerCountChange(num) {
 	});
 }
 
-function newKey(Kk, value, gridArea, player) {
+function newKey(letter_uppercase, value, gridArea, player) {
 		let button = document.createElement("button");
 		button.classList.add("key");
-		button.innerHTML = Kk;
+		button.innerHTML = letter_uppercase;
 		button.value = value;
 		button.addEventListener("pointerdown", letterPointerdownHandler);
 		button.style.gridArea = gridArea;
@@ -116,6 +116,7 @@ function Player() {
 		this.player.divKeyboard.style.display = "grid";
 		this.player.word = "";
 		this.player.divWord.innerHTML = "";
+		this.player.buttonOK.disabled = true; 
 		this.player.divImage.removeChild(this.player.divImage.firstChild);
 		Array.from(this.player.divKeyboard.children).filter(el => Array.from(el.classList).includes("letterKey")).forEach(function (b) {
 			b.style.visibility = "visible";
@@ -126,8 +127,9 @@ function Player() {
 	this.keys = [];
 
 	//Alphabet Keys
-	KEYS.forEach(function (Kk) {
-		let button = new newKey(Kk, Kk[1], Kk[1], this);
+	KEYS.forEach(function (letter_uppercase) {
+		let letter_lowercase = letter_uppercase.toLowerCase();
+		let button = new newKey(letter_uppercase, letter_lowercase, letter_lowercase, this);
 		button.classList.add("letterKey");
 		this.divKeyboard.appendChild(button);
 	}.bind(this));
@@ -145,9 +147,10 @@ function Player() {
 	this.divKeyboard.appendChild(buttonSpace);
 
 	let buttonOK = new newKey("OK", "OK", "ok", this);
+	buttonOK.id = "buttonOK";
 	buttonOK.disabled = true;
 	buttonOK.removeEventListener("pointerdown", letterPointerdownHandler);
-	buttonOK.addEventListener("pointerdown", function () {
+	buttonOK.addEventListener("click", function () {
 		let choices = image_library.filter(o => o.text === this.player.word);
 		let choice = choices[Math.floor(Math.random()*choices.length)];
 		let img = document.createElement("img");
@@ -163,7 +166,7 @@ function Player() {
 	this.buttonOK = buttonOK;
 	this.divKeyboard.appendChild(buttonOK);
 
-	let buttonBS = new newKey("Back<br>Space", "BS", "bs", this);
+	let buttonBS = new newKey("&larr;BS", "BS", "bs", this);
 	buttonBS.removeEventListener("pointerdown", letterPointerdownHandler);
 	buttonBS.addEventListener("pointerdown", function () {
 		this.player.word = this.player.word.slice(0, -1);

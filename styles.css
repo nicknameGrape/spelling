@@ -17,7 +17,6 @@ body {
 }
 
 #hub {
-	height: 15vh;
 	aspect-ratio: 1/1;
 	background: skyblue;
 	display: flex;
@@ -31,10 +30,11 @@ body {
 
 #divSetPlayerNumber {
 	display: grid;
-	grid-template-rows: 1fr 2fr;
+	grid-template-rows: 1fr 1fr;
 	grid-template-areas:
 		"title title title title title"
 		"p1 p2 p3 p4 p5";
+	box-sizing: border-box;
 	gap: 5px;
 	padding: 5px;
 }
@@ -44,6 +44,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	text-wrap: nowrap;
 }
 
 label {
@@ -71,6 +72,7 @@ input[type="checkbox"]:checked+label {
 	align-items: center;
 	justify-content: space-around;
 	font-size: 7vh;
+	text-wrap: nowrap;
 }
 
 #dl {
@@ -123,21 +125,38 @@ input[type="checkbox"]:checked+label {
 		"h i j k l m n"
 		"o p q r s t u"
 		"v w x y z period ok"
-		". space space space bs bs ok";
-	grid-template-columns: repeat(7, 1fr);
+		"space space space bs bs bs ok";
+	grid-template-columns: repeat(7, minmax(2vw,1fr));
 	grid-template-rows: repeat(5, 1fr);
-	gap: 5px;
+	gap: 3px;
 	padding: 5px;
 }
 
 .key {
+	font-family: sans-serif;
+	font-size: 3vh;
+	height: 5vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.letterKey {
 	background: pink;
-	font-family: serif;
-	font-size: 1.5vh;
+	line-height: 0px;
 }
 
 .buttonBackSpace {
 	background: red;
+}
+
+#buttonOK {
+	height: 100%;
+	background: lime;
+}
+
+#buttonOK:disabled {
+	background: lightgray;
 }
 
 #buttonReset {
