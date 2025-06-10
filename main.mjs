@@ -66,6 +66,7 @@ function letterPointerdownHandler() {
 	let ll = this.value;
 	let testString = this.player.word+ll;
 	updateKeyboard.bind(this)(testString);
+	this.player.showImage();
 }
 
 function playerCountChange(num) {
@@ -97,11 +98,33 @@ function newKey(letter_uppercase, value, gridArea, player) {
 }
 
 function Player() {
+	this.showImage = function () {
+		this.divImage.style.opacity = "1";
+		this.isImageHidden = false;
+	}
+	this.hideImage = function () {
+		this.divImage.style.opacity = "0";
+		this.isImageHidden = true;
+	}
+	this.toggleImage = function () {
+		if (this.isImageHidden) {
+			this.divImage.style.opacity = "1";
+			this.isImageHidden = false;
+		} else {
+			this.divImage.style.opacity = "0";
+			this.isImageHidden = true;
+		}
+	}
+	this.isImageHidden = false;
 	this.div = document.createElement("div");
 	this.div.classList.add("player");
 	this.divImage = document.createElement("div");
 	this.divImage.classList.add("image_library");
 	this.divImage.style.display = "none";
+	this.divImage.addEventListener("pointerdown", function () {
+		console.log("hide or show image");
+		this.toggleImage();
+	}.bind(this));
 	this.divWord = document.createElement("div");
 	this.divWord.classList.add("word");
 	this.divKeyboard = document.createElement("div");
@@ -157,6 +180,7 @@ function Player() {
 		img.src = "image_library/images/"+choice.src;
 		this.player.divImage.appendChild(img);
 		this.player.divImage.style.display = "";
+		this.player.showImage();
 		this.player.divKeyboard.style.display = "none";
 		this.player.buttonReset.style.display = "flex";
 		this.player.divWord.innerHTML = choice.text.toUpperCase();
@@ -187,6 +211,30 @@ if (playerCount === null) {playerCount = 1;}
 console.log("PC", localStorage.getItem("players"), playerCount);
 let players = [
 ]
+let divPlayers = document.getElementById("players");
+
+let buttonQuiz = document.getElementById("buttonQuiz");
+buttonQuiz.addEventListener("pointerdown", function () {
+	console.log("QUIZ TIME");
+	let tmp = [];
+	while (players.length > 0) {
+		let randomIndex = Math.floor(Math.random()*players.length);
+		let player = players.splice(randomIndex, 1)[0];
+		tmp.push(player);
+	}
+	players = tmp;
+	//hide all images
+	players.forEach(function (p) {
+		p.hideImage();
+	});
+	//repopulate div players
+	while (divPlayers.firstChild) {
+		divPlayers.removeChild(divPlayers.firstChild);
+	}
+	for (let i=0;i<tmp.length;i++) {
+		divPlayers.appendChild(tmp[i].div);
+	}
+});
 for (let i=0; i<5; i++) {
 	console.log(i);
 	let player = new Player();
@@ -205,7 +253,7 @@ for (let i=0; i<5; i++) {
 	player.radio = radio;
 	player.radioLabel = label;
 	player.div.style.display = "none";
-	document.getElementById("players").appendChild(player.div);
+	divPlayers.appendChild(player.div);
 	document.getElementById("divSetPlayerNumber").appendChild(radio);
 	document.getElementById("divSetPlayerNumber").appendChild(label);
 	players.push(player);

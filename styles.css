@@ -12,7 +12,7 @@ body {
 
 #top {
 	display: grid;
-	grid-template-columns: 15vh 1fr 4fr;
+	grid-template-columns: 15vh 1fr 1fr 4fr;
 	background: tan;
 }
 
@@ -37,6 +37,10 @@ body {
 	box-sizing: border-box;
 	gap: 5px;
 	padding: 5px;
+}
+
+#buttonQuiz {
+	margin: 2vh;
 }
 
 #nop_title {
@@ -114,6 +118,8 @@ input[type="checkbox"]:checked+label {
 	background: white;
 	color: black;
 	font-size: 5vh;
+	word-break: break-word;
+	hyphens: auto;
 }
 
 .keyboard {
