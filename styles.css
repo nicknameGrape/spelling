@@ -108,6 +108,21 @@ input[type="checkbox"]:checked+label {
 	align-items: center;
 	justify-content: center;
 	background: snow;
+	color: white;
+}
+
+.matches {
+	flex-shrink: 2;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 3px;
+	margin: 3px;
+	overflow: scroll;
+}
+
+.match {
+	font-size: large;
 }
 
 .word {
@@ -120,6 +135,7 @@ input[type="checkbox"]:checked+label {
 	font-size: 5vh;
 	word-break: break-word;
 	hyphens: auto;
+	resize: none;
 }
 
 .keyboard {
