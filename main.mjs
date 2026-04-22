@@ -1,72 +1,13 @@
 import image_library from "./image_library/image_library.mjs"
 const KEYS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
-function updateKeyboard(testString) {
-	let p = this.player;
-	let pool = [];
-	//allow only one single entry per text
-	pool.push(image_library[0]);
-	image_library.forEach(function (o) {
-		let sameText = image_library.filter(o2 => o.text === o2.text);
-		if (sameText.length > 1) {
-			//check that we don't already have one
-			if (pool.filter(o3 => o3.text === sameText[0].text).length === 0) {
-				pool.push(sameText[Math.floor(Math.random()*sameText.length)]);
-			}
-		} else {
-			pool.push(sameText[0]);
-		}
-	});
-	p.buttonOK.disabled = true;
-	//array of words that match
-	pool = pool.filter(function (o) {
-		return o.text.slice(0, testString.length).toLowerCase() === testString;
-	})
-	//if there are matches, letter to word
-	if (pool.length > 1) {
-		p.word = testString;
-		p.divWord.innerHTML = p.word.toUpperCase();
-		//hide letters with no matches
-		let nextLetters = new Set();
-		pool.forEach(function (o) {
-			//if there is an exact match, enable OK button
-			if (testString === o.text) {
-				p.buttonOK.disabled = false;
-			}
-			let nl = o.text[p.word.length];
-			if (typeof nl !== "undefined") {
-				nextLetters.add(nl.toLowerCase());
-			}
-		});
-		Array.from(p.divKeyboard.children).filter(el => Array.from(el.classList).includes("letterKey")).forEach(function (b) {
-			b.style.visibility = "hidden";
-			//b.removeEventListener("click", clickHandler);
-			if (
-				nextLetters.has(b.value)
-			) {
-				b.style.visibility = "visible";
-				//b.addEventListener("click", clickHandler);
-			}
-		});
-	} else {
-		//autocomplete
-		console.log("ONLY", pool[0].text, "REMAINS");
-		//Array.from(p.divKeyboard.children).forEach(el => el.style.visibility = "hidden");
-		p.divKeyboard.style.display = "none";
-		p.buttonReset.style.display = "flex";
-		p.divWord.innerHTML = pool[0].text.toUpperCase();
-		let img = document.createElement("img");
-		img.src = "image_library/images/"+pool[0].src;
-		p.divImage.appendChild(img);
-		p.divImage.style.display = "";
-	}
+function letterPointerdownHandler() {
+	this.player.divWord.value += this.value.toUpperCase();
+	this.player.update();
 }
 
-function letterPointerdownHandler() {
-	let ll = this.value;
-	let testString = this.player.word+ll;
-	updateKeyboard.bind(this)(testString);
-	this.player.showImage();
+function textareaInputHandler() {
+	this.player.update();
 }
 
 function playerCountChange(num) {
@@ -87,17 +28,137 @@ function playerCountChange(num) {
 }
 
 function newKey(letter_uppercase, value, gridArea, player) {
-		let button = document.createElement("button");
-		button.classList.add("key");
-		button.innerHTML = letter_uppercase;
-		button.value = value;
-		button.addEventListener("pointerdown", letterPointerdownHandler);
-		button.style.gridArea = gridArea;
-		button.player = player;
-		return button;
+	let button = document.createElement("button");
+	button.classList.add("key");
+	button.innerHTML = letter_uppercase;
+	button.value = value;
+	button.addEventListener("pointerdown", letterPointerdownHandler);
+	button.style.gridArea = gridArea;
+	button.player = player;
+	button.tabIndex = "-1";
+	return button;
 }
 
 function Player() {
+	this.update = function () {
+		//make textarea text uppercase to simplify comparisons later
+		this.divWord.value = this.divWord.value.toUpperCase();
+		//find matches that start with the entered text
+		let pool = image_library.filter(function (o) {
+			return o.text.toUpperCase().startsWith(this.divWord.value);
+		}.bind(this));
+		console.log(pool);
+		if (this.ilo === null) {
+			while (this.divImage.firstChild) {
+				this.divImage.removeChild(this.divImage.firstChild);
+			}
+			this.divImage.style.display = "none";
+			this.divMatches.style.display = "";
+		}
+		if (pool.length > 1) {
+			if (pool.map(ilo => ilo.text.toUpperCase()).includes(this.divWord.value)) {
+				this.buttonOK.disabled = false;
+			} else {
+				this.buttonOK.disabled = true;
+			}
+			//update possible matches
+			while(this.divMatches.firstChild) {
+				this.divMatches.removeChild(this.divMatches.firstChild);
+			}
+			//create new match buttons
+			if (this.divWord.value.length > 0) {
+				pool.forEach(function (match) {
+					let button = document.createElement("button");
+					button.classList.add("match");
+					//disambiguation
+					if (pool.filter(ilo => ilo.text === match.text).length === 1) {
+						button.innerHTML = match.text.toUpperCase();
+					} else {
+						button.innerHTML = match.text.toUpperCase() + " (" + match.tags[0].replace("_", " ") + ")";
+					}
+					button.tabIndex = "-1";
+					button.ilo = match;
+					button.addEventListener("click", function (ev) {
+						let ilo = ev.target.ilo;
+						let img = document.createElement("img");
+						this.ilo = ilo;
+						img.src = "image_library/images/"+ilo.src;
+						this.divImage.appendChild(img);
+						this.divImage.style.display = "";
+						this.showImage();
+						this.divMatches.style.display = "none";
+						this.divKeyboard.style.display = "none";
+						this.buttonReset.style.display = "flex";
+						this.divWord.value = ilo.text.toUpperCase();
+					}.bind(this));
+					this.divMatches.appendChild(button);
+				}.bind(this));
+			}
+			//hide letters with no matches on divKeyboard
+			let nextLetters = new Set();
+			pool.forEach(function (o) {
+				//if there is an exact match, enable OK button
+				if (o.text.toUpperCase() === this.divWord.value.toUpperCase()) {
+					this.buttonOK.disabled = false;
+				}
+				let nl = o.text[this.divWord.value.length];
+				if (typeof nl !== "undefined") {
+					nextLetters.add(nl.toLowerCase());
+				}
+			}.bind(this));
+			Array.from(this.divKeyboard.children).filter(el => Array.from(el.classList).includes("letterKey")).forEach(function (b) {
+				b.style.visibility = "hidden";
+				//b.removeEventListener("click", clickHandler);
+				if (
+					nextLetters.has(b.value)
+				) {
+					b.style.visibility = "visible";
+				}
+			});
+		} else if (pool.length === 1) {
+			//autocomplete word and display image
+			if (this.ilo === null) {
+				this.ilo = pool[0];
+				this.divMatches.style.display = "none";
+				this.divKeyboard.style.display = "none";
+				this.divWord.value = this.ilo.text.toUpperCase();
+				let img = document.createElement("img");
+				img.src = "image_library/images/"+this.ilo.src;
+				this.divImage.appendChild(img);
+				this.divImage.style.display = "";
+				this.buttonReset.style.display = "flex";
+			}
+		} else { //if you enter a wrong letter or type a word with no matches in the image_library
+			while (pool.length === 0 && this.divWord.value.length > 0) {
+				this.divWord.value = this.divWord.value.slice(0, -1);
+				pool = image_library.filter(function (o) {
+					return o.text.toUpperCase().startsWith(this.divWord.value);
+				}.bind(this));
+			}
+		}
+	}
+	this.backspaceHandler = function () {
+		//when backspace is pressed, or the backspace button is clicked,
+		//delete as many letters as possible
+		let word = this.divWord.value;
+		let originalNumberOfMatches = image_library.filter(ilo => ilo.text.toUpperCase().startsWith(word)).length;
+		console.log(originalNumberOfMatches, "ORIGINAL MATCHES")
+		while (image_library.filter(ilo => ilo.text.toUpperCase().startsWith(word)).length === originalNumberOfMatches) {
+			if (word.length > 0) {
+				word = word.slice(0, -1);
+			}
+			console.log("SHORTENED TO", word);
+		}
+		this.divWord.value = word;
+		this.ilo = null;
+		if (this.divImage.firstChild) {
+			this.divImage.removeChild(this.divImage.firstChild);
+		}
+		this.buttonReset.style.display = "none";
+		this.divKeyboard.style.display = "grid";
+		this.divMatches.style.display = "";
+		this.update();
+	}
 	this.showImage = function () {
 		this.divImage.style.opacity = "1";
 		this.isImageHidden = false;
@@ -108,16 +169,35 @@ function Player() {
 	}
 	this.toggleImage = function () {
 		if (this.isImageHidden) {
-			this.divImage.style.opacity = "1";
-			this.isImageHidden = false;
+			this.showImage();
 		} else {
-			this.divImage.style.opacity = "0";
-			this.isImageHidden = true;
+			this.hideImage();
 		}
 	}
-	this.isImageHidden = false;
 	this.div = document.createElement("div");
 	this.div.classList.add("player");
+	this.divWord = document.createElement("textarea");
+	this.divWord.addEventListener("input", textareaInputHandler);
+	this.divWord.rows = 2;
+	this.divWord.classList.add("word");
+	this.divWord.player = this;
+	this.divWord.addEventListener("keydown", function (ev) {
+		if (ev.key === "Escape") {
+			this.buttonReset.click();
+		}
+		if (ev.key === "Enter") {
+			ev.preventDefault();
+			this.buttonOK.click();
+		}
+		if (ev.key === "Backspace") {
+			ev.preventDefault();
+			this.backspaceHandler();
+		}
+	}.bind(this));
+	this.divMatches = document.createElement("div");
+	this.divMatches.classList.add("matches");
+	this.divKeyboard = document.createElement("div");
+	this.divKeyboard.classList.add("keyboard");
 	this.divImage = document.createElement("div");
 	this.divImage.classList.add("image_library");
 	this.divImage.style.display = "none";
@@ -125,28 +205,29 @@ function Player() {
 		console.log("hide or show image");
 		this.toggleImage();
 	}.bind(this));
-	this.divWord = document.createElement("div");
-	this.divWord.classList.add("word");
-	this.divKeyboard = document.createElement("div");
-	this.divKeyboard.classList.add("keyboard");
+	this.isImageHidden = false;
 	this.buttonReset = document.createElement("button");
 	this.buttonReset.id = "buttonReset";
 	this.buttonReset.style.display = "none";
 	this.buttonReset.innerHTML = "Reset";
 	this.buttonReset.player = this;
-	this.buttonReset.addEventListener("pointerdown", function () {
+	this.buttonReset.tabIndex = "-1";
+	this.buttonReset.addEventListener("click", function () {
 		this.style.display = "none";
 		this.player.divKeyboard.style.display = "grid";
-		this.player.word = "";
-		this.player.divWord.innerHTML = "";
 		this.player.buttonOK.disabled = true; 
-		this.player.divImage.removeChild(this.player.divImage.firstChild);
-		Array.from(this.player.divKeyboard.children).filter(el => Array.from(el.classList).includes("letterKey")).forEach(function (b) {
-			b.style.visibility = "visible";
-		});
+		this.player.ilo = null;
+		this.player.divWord.value = "";
+		this.player.update();
+		while (this.player.divImage.firstChild) {
+			this.player.divImage.removeChild(this.player.divImage.firstChild);
+		}
+		//Array.from(this.player.divKeyboard.children).filter(el => Array.from(el.classList).includes("letterKey")).forEach(function (b) {
+		//	b.style.visibility = "visible";
+		//});
 		let bsp = document.getElementById("buttonSpace").style.visibility = "hidden";
 	});
-	this.word = "";
+	this.ilo = null;
 	this.keys = [];
 
 	//Alphabet Keys
@@ -174,17 +255,20 @@ function Player() {
 	buttonOK.disabled = true;
 	buttonOK.removeEventListener("pointerdown", letterPointerdownHandler);
 	buttonOK.addEventListener("click", function () {
-		let choices = image_library.filter(o => o.text === this.player.word);
-		let choice = choices[Math.floor(Math.random()*choices.length)];
+		let choice = image_library.find(function (o) {
+			return o.text.toUpperCase() === this.divWord.value.toUpperCase()
+		}.bind(this.player));
 		let img = document.createElement("img");
-		img.src = "image_library/images/"+choice.src;
+		//img.src = "image_library/images/"+choice.src;
+		img.src = "wizard.png";
 		this.player.divImage.appendChild(img);
 		this.player.divImage.style.display = "";
 		this.player.showImage();
+		this.player.divMatches.style.display = "none";
 		this.player.divKeyboard.style.display = "none";
 		this.player.buttonReset.style.display = "flex";
 		this.player.divWord.innerHTML = choice.text.toUpperCase();
-		console.log(this.player.word, "chosen", choice);
+		console.log(this.player.divWord.value, "chosen", choice);
 		console.log(this.player.divImage, "DIVIMAGE", img);
 	});
 	this.buttonOK = buttonOK;
@@ -193,8 +277,7 @@ function Player() {
 	let buttonBS = new newKey("&larr;BS", "BS", "bs", this);
 	buttonBS.removeEventListener("pointerdown", letterPointerdownHandler);
 	buttonBS.addEventListener("pointerdown", function () {
-		this.player.word = this.player.word.slice(0, -1);
-		updateKeyboard.bind(this)(this.player.word);
+		this.player.backspaceHandler();
 	});
 	buttonBS.classList.add("key");
 	buttonBS.classList.add("buttonBackSpace");
@@ -202,6 +285,7 @@ function Player() {
 
 	this.div.appendChild(this.divWord);
 	this.div.appendChild(this.divImage);
+	this.div.appendChild(this.divMatches);
 	this.div.appendChild(this.divKeyboard);
 	this.div.appendChild(this.buttonReset);
 }

@@ -107,7 +107,7 @@ input[type="checkbox"]:checked+label {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: snow;
+	background: gray;
 	color: white;
 }
 
@@ -118,7 +118,7 @@ input[type="checkbox"]:checked+label {
 	justify-content: center;
 	gap: 3px;
 	margin: 3px;
-	overflow: scroll;
+	overflow: auto;
 }
 
 .match {
