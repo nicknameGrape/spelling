@@ -181,6 +181,7 @@ function Player() {
 	this.divWord.rows = 2;
 	this.divWord.classList.add("word");
 	this.divWord.player = this;
+	this.divWord.tabIndex = 1;
 	this.divWord.addEventListener("keydown", function (ev) {
 		if (ev.key === "Escape") {
 			this.buttonReset.click();
@@ -259,8 +260,7 @@ function Player() {
 			return o.text.toUpperCase() === this.divWord.value.toUpperCase()
 		}.bind(this.player));
 		let img = document.createElement("img");
-		//img.src = "image_library/images/"+choice.src;
-		img.src = "wizard.png";
+		img.src = "image_library/images/"+choice.src;
 		this.player.divImage.appendChild(img);
 		this.player.divImage.style.display = "";
 		this.player.showImage();
